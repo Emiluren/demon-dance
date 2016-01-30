@@ -49,7 +49,7 @@ class PlayState extends FlxState
         add(line);
 
         progressBar = new FlxBar(0, 30, FlxBar.FILL_LEFT_TO_RIGHT, 640, 40);
-        //progressBar.currentValue = 100;
+        progressBar.currentValue = 10;
         progressBar.setRange(0, 100);
         progressBar.createFilledBar(FlxColor.WHITE, 0xFFE6AA2F);
         add(progressBar);
@@ -92,16 +92,19 @@ class PlayState extends FlxState
         arrows.add(new Arrow(FlxG.width, arrowSpawnHeight, FlxG.width * arrowSpeed));
 
         var prog = progressBar.currentValue;
-        if (prog < 20)
-            timer.time = 2;
+        var interval_time = if (prog < 20)
+            2;
         else if (prog < 40)
-            timer.time = 1.5;
+            1.5;
         else if (prog < 60)
-            timer.time = 1;
+            1;
         else if (prog < 80)
-            timer.time = 0.7;
+            0.7;
         else
-            timer.time = 0.5;
+            0.5;
+
+        if (interval_time < timer.time)
+            timer.time = interval_time;
     }
 
     private function updateProgress(value:Int)
@@ -123,6 +126,11 @@ class PlayState extends FlxState
             arrowScore = 2;
         else
             arrowScore = 1;
+
+        if (prog == 0)
+            FlxG.switchState(new GameOverState(false));
+        if (prog == 100)
+            FlxG.switchState(new GameOverState(true));
     }
 
     private function onArrowLineCollision(line:FlxSprite, arrow:Arrow)
