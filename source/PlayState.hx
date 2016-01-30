@@ -9,6 +9,7 @@ import flixel.util.FlxMath;
 import flixel.group.FlxTypedGroup;
 import flixel.util.FlxTimer;
 import flixel.util.FlxColor;
+import flixel.ui.FlxBar;
 
 /**
  * A FlxState which can be used for the actual gameplay.
@@ -23,6 +24,7 @@ class PlayState extends FlxState
     private var arrowSpawnHeight:Float = FlxG.height * 0.7;
     private var touchingArrow:Arrow = null;
     private var lastArrow:Arrow = null;
+    private var progressBar:FlxBar;
 
 	/**
 	 * Function that is called up when to state is created to set it up. 
@@ -38,6 +40,12 @@ class PlayState extends FlxState
 
         timer = new FlxTimer(2, onTimer, 0);
         onTimer(timer);
+
+        progressBar = new FlxBar(0, 30, FlxBar.FILL_LEFT_TO_RIGHT, 640, 40);
+        //progressBar.currentValue = 30;
+        progressBar.setRange(0, 100);
+        progressBar.createFilledBar(FlxColor.WHITE, 0xFFE6AA2F);
+        add(progressBar);
 
 		super.create();
 	}
@@ -60,6 +68,11 @@ class PlayState extends FlxState
 
         touchingArrow = null;
         FlxG.overlap(line, arrows, onArrowLineCollision);
+
+        if (lastArrow != touchingArrow && lastArrow.isNew()) {
+            lastArrow.miss();
+            progressBar.currentValue -= 1;
+        }
 	}	
 
 
@@ -71,18 +84,12 @@ class PlayState extends FlxState
         arrows.add(new Arrow(FlxG.width, arrowSpawnHeight,FlxG.width * arrowSpeed));
     }
 
-    private function onArrowLineCollision(L:FlxSprite, A:Arrow)
+    private function onArrowLineCollision(line:FlxSprite, arrow:Arrow)
     {
-        touchingArrow = A;
-        lastArrow = A;
-        if (FlxG.keys.justPressed.UP)
-            A.hit(Up);
-        else if (FlxG.keys.justPressed.RIGHT)
-            A.hit(Right);
-        else if (FlxG.keys.justPressed.DOWN)
-            A.hit(Down);
-        else if (FlxG.keys.justPressed.LEFT)
-            A.hit(Left);
+        touchingArrow = arrow;
+        lastArrow = arrow;
+
+        progressBar.currentValue += 3 * arrow.checkHit();
     }
 	
 	/**

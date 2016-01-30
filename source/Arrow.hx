@@ -42,7 +42,38 @@ class Arrow extends FlxSprite
         super.update();
     }
 
-    public function hit(dir:Direction):ArrowState
+    public function checkHit():Int
+    {
+        if (FlxG.keys.anyJustPressed(["UP", "RIGHT", "DOWN", "LEFT"])) {
+            var oldState = state;
+            hit(keyToDirection());
+            var newState = state;
+
+            if (oldState == New) {
+                if (newState == Hit) {
+                    return 1;
+                }
+                else {
+                    return -1;
+                }
+            }
+        }
+        return 0;
+    }
+
+    private function keyToDirection():Direction
+    {
+        if (FlxG.keys.justPressed.UP)
+            return Up;
+        else if (FlxG.keys.justPressed.RIGHT)
+            return Right;
+        else if (FlxG.keys.justPressed.DOWN)
+            return Down;
+        else
+            return Left;
+    }
+
+    private function hit(dir:Direction):Void
     {
         if (state == New) {
             if (dir == direction) {
@@ -50,16 +81,25 @@ class Arrow extends FlxSprite
                 state = Hit;
             }
             else {
-                loadGraphic("assets/images/arrow_missed.png");
-                state = Missed;
+                miss();
             }
         }
-        return state;
+    }
+
+    public function miss():Void
+    {
+        loadGraphic("assets/images/arrow_missed.png");
+        state = Missed;
     }
 
     public function getDirection():Direction
     {
         return direction;
+    }
+
+    public function isNew():Bool
+    {
+        return state == New;
     }
 
     public override function destroy():Void
