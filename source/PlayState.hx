@@ -17,13 +17,19 @@ import flixel.ui.FlxBar;
 class PlayState extends FlxState
 {
     private var arrows:FlxTypedGroup<Arrow>;
-    private var arrowSpeed:Float = -0.1;
-    private var spawnInterval:Float = 0.5;
-    private var timer:FlxTimer;
-    private var line:FlxSprite;
-    private var arrowSpawnHeight:Float = FlxG.height * 0.7;
+    private var arrowSpawnHeight = FlxG.height * 0.7;
     private var touchingArrow:Arrow = null;
     private var lastArrow:Arrow = null;
+
+    private var arrowSpeed = -0.15;
+    private var arrowScore = 5;
+    private var missPenalty = 3.0;
+    private var penaltyFactor = 1.5;
+
+    private var spawnInterval = 0.5;
+    private var timer:FlxTimer;
+
+    private var line:FlxSprite;
     private var progressBar:FlxBar;
 
 	/**
@@ -31,6 +37,10 @@ class PlayState extends FlxState
 	 */
 	override public function create():Void
 	{
+        var arrowBG = new FlxSprite(0, arrowSpawnHeight-30);
+        arrowBG.makeGraphic(640, 100);
+        add(arrowBG);
+
         arrows = new FlxTypedGroup<Arrow>();
         add(arrows);
 
@@ -38,14 +48,13 @@ class PlayState extends FlxState
         line.makeGraphic(10, 80, FlxColor.RED);
         add(line);
 
-        timer = new FlxTimer(2, onTimer, 0);
-        onTimer(timer);
-
         progressBar = new FlxBar(0, 30, FlxBar.FILL_LEFT_TO_RIGHT, 640, 40);
-        //progressBar.currentValue = 30;
+        //progressBar.currentValue = 100;
         progressBar.setRange(0, 100);
         progressBar.createFilledBar(FlxColor.WHITE, 0xFFE6AA2F);
         add(progressBar);
+
+        timer = new FlxTimer(2, onTimer, 0);
 
 		super.create();
 	}
@@ -71,17 +80,49 @@ class PlayState extends FlxState
 
         if (lastArrow != touchingArrow && lastArrow.isNew()) {
             lastArrow.miss();
-            progressBar.currentValue -= 1;
+            updateProgress(-Std.int(missPenalty));
         }
 	}	
-
 
     /**
      * Function that spawns new arrows at an interval
      */
     private function onTimer(Timer:FlxTimer)
     {
-        arrows.add(new Arrow(FlxG.width, arrowSpawnHeight,FlxG.width * arrowSpeed));
+        arrows.add(new Arrow(FlxG.width, arrowSpawnHeight, FlxG.width * arrowSpeed));
+
+        var prog = progressBar.currentValue;
+        if (prog < 20)
+            timer.time = 2;
+        else if (prog < 40)
+            timer.time = 1.5;
+        else if (prog < 60)
+            timer.time = 1;
+        else if (prog < 80)
+            timer.time = 0.7;
+        else
+            timer.time = 0.5;
+    }
+
+    private function updateProgress(value:Int)
+    {
+        progressBar.currentValue += value;
+        if (value > 0)
+            missPenalty = 3;
+        else if (value < 0)
+            missPenalty *= penaltyFactor;
+
+        var prog = progressBar.currentValue;
+        if (prog < 20)
+            arrowScore = 5;
+        else if (prog < 40)
+            arrowScore = 4;
+        else if (prog < 60)
+            arrowScore = 3;
+        else if (prog < 80)
+            arrowScore = 2;
+        else
+            arrowScore = 1;
     }
 
     private function onArrowLineCollision(line:FlxSprite, arrow:Arrow)
@@ -89,7 +130,13 @@ class PlayState extends FlxState
         touchingArrow = arrow;
         lastArrow = arrow;
 
-        progressBar.currentValue += 3 * arrow.checkHit();
+        var checkResult = arrow.checkHit();
+        if (checkResult == 1) {
+            updateProgress(arrowScore);
+        }
+        else if (checkResult == -1) {
+            updateProgress(-Std.int(missPenalty));
+        }
     }
 	
 	/**

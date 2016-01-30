@@ -53,9 +53,7 @@ class Arrow extends FlxSprite
                 if (newState == Hit) {
                     return 1;
                 }
-                else {
-                    return -1;
-                }
+                return -1;
             }
         }
         return 0;
