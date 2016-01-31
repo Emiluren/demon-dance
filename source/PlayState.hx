@@ -43,7 +43,7 @@ class PlayState extends FlxState
 
         add(new Dancer(300, 220));
 
-        var bgcolor = 0xAAAAAAFF;
+        var bgcolor = 0xFF335566;
         var arrowBG = new FlxSprite(0, arrowSpawnHeight-30);
         arrowBG.makeGraphic(640, 100, bgcolor);
         add(arrowBG);
@@ -52,13 +52,13 @@ class PlayState extends FlxState
         add(arrows);
 
         line = new FlxSprite(100, arrowSpawnHeight-20);
-        line.makeGraphic(10, 80, FlxColor.RED);
+        line.makeGraphic(10, 80, 0xFFFF6622);
         add(line);
 
         progressBar = new FlxBar(0, 30, FlxBar.FILL_LEFT_TO_RIGHT, 640, 40);
         progressBar.currentValue = 10;
         progressBar.setRange(0, 100);
-        progressBar.createFilledBar(bgcolor, 0xAAE6AA2F);
+        progressBar.createFilledBar(bgcolor, 0xFFE6AA2F);
         add(progressBar);
 
         timer = new FlxTimer(2, onTimer, 0);
