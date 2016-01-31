@@ -10,6 +10,8 @@ import flixel.group.FlxTypedGroup;
 import flixel.util.FlxTimer;
 import flixel.util.FlxColor;
 import flixel.ui.FlxBar;
+import flixel.effects.particles.FlxEmitter;
+import flixel.effects.particles.FlxParticle;
 
 /**
  * A FlxState which can be used for the actual gameplay.
@@ -33,6 +35,8 @@ class PlayState extends FlxState
     private var progressBar:FlxBar;
 
     private var dancer:Dancer;
+    private var sparkEmitter:FlxEmitter;
+    private var smokeEmitter:FlxEmitter;
 
 	/**
 	 * Function that is called up when to state is created to set it up. 
@@ -45,6 +49,44 @@ class PlayState extends FlxState
 
         dancer = new Dancer(300, 220, false);
         add(dancer);
+
+        sparkEmitter = new FlxEmitter(330, 200, 50);
+		sparkEmitter.setXSpeed(-50, 50);
+		sparkEmitter.setYSpeed(-200, -100);
+		add(sparkEmitter);
+		
+		for (i in 0...(Std.int(sparkEmitter.maxSize / 2))) 
+		{
+            var sparkColor = 0xEEFFFFAA;
+			var particle = new FlxParticle();
+			particle.makeGraphic(2, 2, sparkColor);
+			particle.visible = false; 
+			sparkEmitter.add(particle);
+
+			particle = new FlxParticle();
+			particle.makeGraphic(1, 1, sparkColor);
+			particle.visible = false;
+			sparkEmitter.add(particle);
+		}
+        sparkEmitter.start(false, 0.5, .1);
+        sparkEmitter.on = false;
+
+        smokeEmitter = new FlxEmitter(330, 200, 400);
+		smokeEmitter.setXSpeed(-50, 50);
+		smokeEmitter.setYSpeed(-200, -100);
+        smokeEmitter.setAlpha(1, 1, 0, 0);
+        smokeEmitter.setScale(0.2, 0.4, 1, 1.2);
+		add(smokeEmitter);
+		
+		for (i in 0...smokeEmitter.maxSize) 
+		{
+			var particle = new FlxParticle();
+			particle.loadGraphic(AssetPaths.smoke__png);
+			particle.visible = false; 
+			smokeEmitter.add(particle);
+		}
+        smokeEmitter.start(false, 0.5, .05);
+        smokeEmitter.on = false;
 
         var bgcolor = 0xFF335566;
         var arrowBG = new FlxSprite(0, arrowSpawnHeight-30);
@@ -110,16 +152,34 @@ class PlayState extends FlxState
 
         // Make the arrows spawn faster as the player progresses
         var prog = progressBar.currentValue;
-        var interval_time = if (prog < 20)
-            2;
-        else if (prog < 40)
-            1.5;
-        else if (prog < 60)
-            1;
-        else if (prog < 80)
-            0.7;
-        else
-            0.5;
+        var interval_time = timer.time;
+        if (prog < 20) {
+            interval_time = 2;
+            sparkEmitter.on = false;
+            smokeEmitter.on = false;
+        }
+        else if (prog < 40) {
+            interval_time = 1.5;
+            sparkEmitter.on = false;
+            smokeEmitter.on = true;
+            smokeEmitter.frequency = 0.5;
+        }
+        else if (prog < 60) {
+            interval_time = 1;
+            sparkEmitter.on = true;
+            sparkEmitter.frequency = 0.1;
+            smokeEmitter.frequency = 0.3;
+        }
+        else if (prog < 80) {
+            interval_time = 0.7;
+            sparkEmitter.frequency = 0.05;
+            smokeEmitter.frequency = 0.1;
+        }
+        else {
+            interval_time = 0.5;
+            sparkEmitter.frequency = 0.01;
+            smokeEmitter.frequency = 0.05;
+        }
 
         if (interval_time < timer.time)
             timer.time = interval_time;
