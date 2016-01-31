@@ -28,24 +28,29 @@ class GameOverState extends FlxState
 	 */
 	override public function create():Void
 	{
-        var bg = new FlxSprite(0, 0);
-        bg.loadGraphic("assets/images/background.png");
-        add(bg);
+        if (playerWon) {
+            var bg = new FlxSprite(0, 0);
+            bg.loadGraphic("assets/images/background.png");
+            add(bg);
 
-        demon = new FlxSprite(300, 120);
-        demon.loadGraphic("assets/images/demon.png");
-        //demon.pixelPerfectRender = false;
-        FlxTween.linearMotion(demon, 300, 110, 300, 130, 2, true, {
-            ease:FlxEase.quadInOut, type:FlxTween.PINGPONG
-        });
-        add(demon);
+            demon = new FlxSprite(300, 120);
+            demon.loadGraphic("assets/images/demon.png");
+            //demon.pixelPerfectRender = false;
+            FlxTween.linearMotion(demon, 300, 110, 300, 130, 2, true, {
+                ease:FlxEase.quadInOut, type:FlxTween.PINGPONG
+            });
+            add(demon);
 
-        add(new Dancer(300, 220));
+            add(new Dancer(300, 220, true));
+        }
 
         var title = new FlxText(0, 60, 640, playerWon ? "You Win!" : "Game Over!", 22);
 		title.alignment = "center";
 		//title.screenCenter(true, false);
 		add(title);
+
+        if (!playerWon) {
+        }
 
 		super.create();
 	}

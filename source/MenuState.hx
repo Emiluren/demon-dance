@@ -17,8 +17,6 @@ class MenuState extends FlxState
 	 */
 	override public function create():Void
 	{
-        FlxG.sound.playMusic(AssetPaths.DemonDance__ogg, 1, true);
-
         FlxG.switchState(new PlayState());
         //FlxG.switchState(new GameOverState(true));
 		super.create();

@@ -32,6 +32,8 @@ class PlayState extends FlxState
     private var line:FlxSprite;
     private var progressBar:FlxBar;
 
+    private var dancer:Dancer;
+
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
@@ -41,7 +43,8 @@ class PlayState extends FlxState
         bg.loadGraphic("assets/images/background.png");
         add(bg);
 
-        add(new Dancer(300, 220));
+        dancer = new Dancer(300, 220, false);
+        add(dancer);
 
         var bgcolor = 0xFF335566;
         var arrowBG = new FlxSprite(0, arrowSpawnHeight-30);
@@ -158,6 +161,7 @@ class PlayState extends FlxState
         var checkResult = arrow.checkHit();
         if (checkResult == 1) {
             updateProgress(arrowScore);
+            dancer.dance();
         }
         else if (checkResult == -1) {
             updateProgress(-Std.int(missPenalty));
