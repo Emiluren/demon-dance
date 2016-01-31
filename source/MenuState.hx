@@ -17,6 +17,10 @@ class MenuState extends FlxState
 	 */
 	override public function create():Void
 	{
+        var title = new FlxText(0, 150, "Demon Dance", 24);
+        title.x = 320 - title.width / 2;
+        add(title);
+
         var button = new FlxButton(0, 300, "Play", clickPlay);
         button.scale.set(2,2);
         button.label.setFormat(null,20,0x333333,"center");
