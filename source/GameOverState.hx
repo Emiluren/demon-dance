@@ -50,6 +50,17 @@ class GameOverState extends FlxState
 		add(title);
 
         if (!playerWon) {
+            demon = new FlxSprite(-570, -800);
+            demon.loadGraphic(AssetPaths.demon_large__png);
+            demon.scale.set(0.01, 0.01);
+
+            FlxTween.tween(demon, { x:-400, y:-4100 }, 1, { type:FlxTween.ONESHOT, ease:FlxEase.quadIn });
+            FlxTween.tween(demon.scale, { x:4, y:4 }, 1, { type:FlxTween.ONESHOT, ease:FlxEase.quadIn });
+
+            var roar = FlxG.sound.load(AssetPaths.wumpus_roar__ogg);
+            roar.play();
+
+            add(demon);
         }
 
 		super.create();
