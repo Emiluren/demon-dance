@@ -17,10 +17,19 @@ class MenuState extends FlxState
 	 */
 	override public function create():Void
 	{
-        FlxG.switchState(new PlayState());
-        //FlxG.switchState(new GameOverState(true));
+        var button = new FlxButton(0, 300, "Play", clickPlay);
+        button.scale.set(2,2);
+        button.label.setFormat(null,20,0x333333,"center");
+        button.label.offset.y = 6;
+        button.x = 320 - button.width / 2;
+        add(button);
 		super.create();
 	}
+
+    private function clickPlay():Void
+    {
+        FlxG.switchState(new PlayState());
+    }
 	
 	/**
 	 * Function that is called when this state is destroyed - you might want to 

@@ -46,8 +46,14 @@ class GameOverState extends FlxState
 
         var title = new FlxText(0, 60, 640, playerWon ? "You Win!" : "Game Over!", 22);
 		title.alignment = "center";
-		//title.screenCenter(true, false);
 		add(title);
+
+        var button = new FlxButton(0, 300, "Menu", clickMenu);
+        button.scale.set(2,2);
+        button.label.setFormat(null,20,0x333333,"center");
+        button.label.offset.y = 6;
+        button.x = 320 - button.width / 2;
+        add(button);
 
         if (!playerWon) {
             demon = new FlxSprite(-570, -800);
@@ -65,6 +71,11 @@ class GameOverState extends FlxState
 
 		super.create();
 	}
+
+    private function clickMenu():Void
+    {
+        FlxG.switchState(new MenuState());
+    }
 	
 	/**
 	 * Function that is called when this state is destroyed - you might want to 
