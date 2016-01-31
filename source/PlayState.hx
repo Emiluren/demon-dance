@@ -37,8 +37,15 @@ class PlayState extends FlxState
 	 */
 	override public function create():Void
 	{
+        var bg = new FlxSprite(0, 0);
+        bg.loadGraphic("assets/images/background.png");
+        add(bg);
+
+        add(new Dancer(300, 220));
+
+        var bgcolor = 0xAAAAAAFF;
         var arrowBG = new FlxSprite(0, arrowSpawnHeight-30);
-        arrowBG.makeGraphic(640, 100);
+        arrowBG.makeGraphic(640, 100, bgcolor);
         add(arrowBG);
 
         arrows = new FlxTypedGroup<Arrow>();
@@ -51,7 +58,7 @@ class PlayState extends FlxState
         progressBar = new FlxBar(0, 30, FlxBar.FILL_LEFT_TO_RIGHT, 640, 40);
         progressBar.currentValue = 10;
         progressBar.setRange(0, 100);
-        progressBar.createFilledBar(FlxColor.WHITE, 0xFFE6AA2F);
+        progressBar.createFilledBar(bgcolor, 0xAAE6AA2F);
         add(progressBar);
 
         timer = new FlxTimer(2, onTimer, 0);
@@ -67,6 +74,7 @@ class PlayState extends FlxState
 		super.update();
         arrows.update();
 
+        // Remove arrows that go off screen
         for (arrow in arrows) {
             if (arrow.x < 0 && !arrow.isOnScreen()) {
                 // maybe this is a memory leak because destroy is not called on arrow
@@ -78,6 +86,12 @@ class PlayState extends FlxState
         touchingArrow = null;
         FlxG.overlap(line, arrows, onArrowLineCollision);
 
+        // Punish the player for mashing keys
+        if (touchingArrow == null && FlxG.keys.anyJustPressed(["UP", "RIGHT", "DOWN", "LEFT"])) {
+            updateProgress(-Std.int(missPenalty));
+        }
+
+        // Give a penalty if the player doesn't press a key in time
         if (lastArrow != touchingArrow && lastArrow.isNew()) {
             lastArrow.miss();
             updateProgress(-Std.int(missPenalty));
@@ -91,6 +105,7 @@ class PlayState extends FlxState
     {
         arrows.add(new Arrow(FlxG.width, arrowSpawnHeight, FlxG.width * arrowSpeed));
 
+        // Make the arrows spawn faster as the player progresses
         var prog = progressBar.currentValue;
         var interval_time = if (prog < 20)
             2;
@@ -115,6 +130,7 @@ class PlayState extends FlxState
         else if (value < 0)
             missPenalty *= penaltyFactor;
 
+        // Give the player fewer points later in the game so it doesn't end to fast
         var prog = progressBar.currentValue;
         if (prog < 20)
             arrowScore = 5;
@@ -138,6 +154,7 @@ class PlayState extends FlxState
         touchingArrow = arrow;
         lastArrow = arrow;
 
+        // Reward the player for pressing the right key
         var checkResult = arrow.checkHit();
         if (checkResult == 1) {
             updateProgress(arrowScore);

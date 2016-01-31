@@ -18,6 +18,7 @@ class MenuState extends FlxState
 	override public function create():Void
 	{
         FlxG.switchState(new PlayState());
+        //FlxG.switchState(new GameOverState(true));
 		super.create();
 	}
 	
